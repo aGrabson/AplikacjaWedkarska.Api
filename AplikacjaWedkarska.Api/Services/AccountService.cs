@@ -1,6 +1,9 @@
 ﻿using AplikacjaWedkarska.Api.Data;
 using AplikacjaWedkarska.Api.Dto;
+using AplikacjaWedkarska.Api.Entities;
 using AplikacjaWedkarska.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,7 +20,7 @@ namespace QuickTickets.Api.Services
             _context = context;
         }
 
-        public TokenInfoDto LoginUser(LoginUserDto loginData)
+        public async Task<IActionResult> LoginUser(LoginUserDto loginData)
         {
             if (_context.Accounts == null)
             {
@@ -25,7 +28,7 @@ namespace QuickTickets.Api.Services
             }
             else
             {
-                var accountEntity = _context.Accounts.Where(x => x.Email == loginData.Email && x.IsDeleted == false).FirstOrDefault();
+                var accountEntity = await _context.Accounts.Where(x => x.Email == loginData.Email && x.IsDeleted == false).FirstOrDefaultAsync();
                 if (accountEntity != null)
                 {
                     SHA256 sha256 = SHA256Managed.Create();
@@ -38,20 +41,123 @@ namespace QuickTickets.Api.Services
                         result.AccessToken = _tokenService.GenerateBearerToken(accountEntity.Id.ToString(), accountEntity.RoleID.ToString());
                         result.RefreshToken = _tokenService.GenerateRefreshToken(accountEntity.Id.ToString(), accountEntity.RoleID.ToString());
 
-                        return result;
+                        return new OkObjectResult(result);
                     }
                     else
                     {
-                        return null;
+                        return new BadRequestResult();
                     }
                 }
                 else
                 {
-                    return null;
+                    return new NotFoundResult();
                 }
             }
         }
+        public string HashPassword(string password)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
+        }
+        public async Task<IActionResult> RegisterUser(RegisterUserDto registerUserDto)
+        {
+            if (_context.Accounts == null || _context.Cards == null)
+            {
+                return new NotFoundResult();
+            }
+            var cardEntity = await _context.Cards.FirstOrDefaultAsync(
+                c => c.Id == registerUserDto.CardNumber &&
+                     c.OwnerName == registerUserDto.Name &&
+                     c.OwnerSurname == registerUserDto.Surname &&
+                     c.Email == registerUserDto.Email
+            );
 
+            if (cardEntity == null)
+            {
+                return new NotFoundResult();
+            }else if (cardEntity.IsRegistered == true)
+            {
+                return new BadRequestResult();
+            }
 
+            AccountEntity accountEntity = new AccountEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = registerUserDto.Name,
+                Surname = registerUserDto.Surname,
+                Email = registerUserDto.Email,
+                Password = HashPassword(registerUserDto.Password),
+                DateOfBirth = registerUserDto.DateOfBirth,
+                RoleID = 2,
+                CardID = cardEntity.Id.ToString(),
+            };
+
+            _context.Accounts.Add(accountEntity);
+            cardEntity.IsRegistered = true;
+            await _context.SaveChangesAsync();
+            return new OkResult();
+        }
+
+        public async Task<IActionResult> GetInfoAboutUser(Guid accountId)
+        {
+            if (_context.Accounts == null )
+            {
+                return new NotFoundResult();
+            }
+
+            var accountEntity = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (accountEntity == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var result = GetUserInfoDto(accountEntity);
+
+            return new OkObjectResult(result);
+        }
+        public UserInfoDto GetUserInfoDto(AccountEntity accountEntity)
+        {
+            return new UserInfoDto
+            {
+                Name = accountEntity.Name,
+                Surname = accountEntity.Surname,
+                Email = accountEntity.Email,
+                CardNumber = accountEntity.CardID,
+            };
+
+        }
+        public async Task<IActionResult> UpdateInfoAboutUser(UpdateUserInfoDto updateUserInfoDto, Guid accountId)
+        {
+            if (_context.Accounts == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var accountEntity = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
+            if (EmailExists(updateUserInfoDto.Email) && (updateUserInfoDto.Email != accountEntity.Email))
+            {
+                return new BadRequestResult();
+            }
+
+            if (accountEntity == null)
+            {
+                return new NotFoundResult();
+            }
+            accountEntity.Name = updateUserInfoDto.Name;
+            accountEntity.Surname = updateUserInfoDto.Surname;
+            accountEntity.Email = updateUserInfoDto.Email;
+
+            _context.Accounts.Update(accountEntity);
+            await _context.SaveChangesAsync();
+
+            return new OkResult();
+        }
+        public bool EmailExists(string email)
+        {
+            return (_context.Accounts?.Any(e => e.Email == email)).GetValueOrDefault();
+        }
     }
 }

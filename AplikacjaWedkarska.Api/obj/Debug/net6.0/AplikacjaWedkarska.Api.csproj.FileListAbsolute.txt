@@ -86,3 +86,5 @@ C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\De
 C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\Debug\net6.0\System.Text.Json.dll
 C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
 C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\Debug\net6.0\Microsoft.Practices.ServiceLocation.dll
+C:\Users\artur\source\repos\AplikacjaWedkarska.Api\AplikacjaWedkarska.Api\bin\Debug\net6.0\XAct.Core.PCL.dll

@@ -1,18 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AplikacjaWedkarska.Api.Entities
+﻿namespace AplikacjaWedkarska.Api.Entities
 {
-    public class FishEntity
+    public class FishEntity : BaseDbItem
     {
-        [Required]
         public string? Species { get; set; }
-        [Required]
-        public double Size { get; set; }
-        [Required]
-        public int Quantity { get; set; }
-        public double Weight { get; set; }
-        public DateTime CaughtDate { get; set; } = DateTime.Now;
-        public DateTime? StartProtection { get; set; }
-        public DateTime? EndProtection { get; set; }
+        public int? MinimumSize { get; set; }
+        public int? MaximumSize { get; set; }
+        public DateTime? ProtectionPeriodStart { get; set; }
+        public DateTime? ProtectionPeriodEnd { get; set; }
+        public int? DailyLimit { get; set; }
+        public bool UnableToTake { get; set; } = false;
     }
 }

@@ -2,21 +2,17 @@
 
 namespace AplikacjaWedkarska.Api.Entities
 {
-    public class FishingSpotEntity
+    public class FishingSpotEntity : BaseDbItem
     {
         public FishingSpotEntity()
         {
-            FishInSpot = new List<FishEntity>();
             FishingSpotLimits = new List<FishingSpotLimitEntity>();
         }
 
-        [StringLength(50)]
         public string? Title { get; set; }
 
-        [StringLength(100)]
         public string? Address { get; set; }
 
-        [StringLength(300)]
         public string? Description { get; set; }
 
         public double Latitude { get; set; }
@@ -27,7 +23,6 @@ namespace AplikacjaWedkarska.Api.Entities
 
         public bool CatchAndRelease { get; set; }
 
-        public virtual ICollection<FishEntity> FishInSpot { get; set; }
         public virtual ICollection<FishingSpotLimitEntity> FishingSpotLimits { get; set; }
     }
 }

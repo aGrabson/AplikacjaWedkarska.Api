@@ -24,7 +24,7 @@ namespace AplikacjaWedkarska.Api.Entities
 
         public int RoleID { get; set; }
 
-        public Guid CardID { get; set; }
+        public string CardID { get; set; }
         public virtual CardEntity? Card { get; set; }
     }
 }

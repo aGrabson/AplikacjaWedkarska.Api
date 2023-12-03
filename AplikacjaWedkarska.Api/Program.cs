@@ -22,7 +22,7 @@ namespace AplikacjaWedkarska.Api
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                   policy =>
                   {
-                      policy.WithOrigins("http://192.168.30.2:3000")
+                      policy.WithOrigins("http://192.168.30.2:3000", "exp://192.168.55.105:19000")
                 .AllowAnyHeader()
                 .WithMethods("GET", "POST")
                 .AllowAnyMethod()
@@ -75,8 +75,8 @@ namespace AplikacjaWedkarska.Api
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
-
-
+            builder.Services.AddScoped<IFishingSpotService, FishingSpotService>();
+            builder.Services.AddScoped<IReservationService, ReservationService>();
 
             var app = builder.Build();
 

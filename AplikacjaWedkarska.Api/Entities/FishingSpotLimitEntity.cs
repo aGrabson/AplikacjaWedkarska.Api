@@ -1,15 +1,11 @@
 ﻿namespace AplikacjaWedkarska.Api.Entities
 {
-    public class FishingSpotLimitEntity
+    public class FishingSpotLimitEntity : BaseDbItem
     {
-        public DateTime DateCreated { get; set; } = DateTime.Now;
-
+        public Guid FishId { get; set; }
+        public virtual FishEntity Fish { get; set; }
+        public int? DailyLimit { get; set; }
         public Guid FishingSpotId { get; set; }
         public virtual FishingSpotEntity? FishingSpot { get; set; }
-
-        public string Species { get; set; }
-
-        public int DailyLimit { get; set; }
-
     }
 }
