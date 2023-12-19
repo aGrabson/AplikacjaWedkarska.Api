@@ -77,7 +77,8 @@ namespace AplikacjaWedkarska.Api
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IFishingSpotService, FishingSpotService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
-
+            builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IInspectionService, InspectionService>();
             var app = builder.Build();
 
             

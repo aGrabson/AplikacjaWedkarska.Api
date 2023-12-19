@@ -22,6 +22,7 @@ namespace AplikacjaWedkarska.Api.Entities
         public string? Type { get; set; }
 
         public bool CatchAndRelease { get; set; }
+        public double Size { get; set; }
 
         public virtual ICollection<FishingSpotLimitEntity> FishingSpotLimits { get; set; }
     }

@@ -8,6 +8,8 @@
         public double? Weight { get; set; }
         public DateTime CatchDateTime { get; set; } = DateTime.Now;
         public string Status { get; set; } = CaughtFishStatusEnum.Taken.ToString();
+        public Guid ReservationId { get; set; }
+        public virtual ReservationEntity? Reservation { get; set; }
 
     }
 }

@@ -6,5 +6,6 @@
         public string Surname { get; set; }
         public string Email { get; set; }
         public string CardNumber { get; set; }
+        public Guid ReservationId { get; set; }
     }
 }

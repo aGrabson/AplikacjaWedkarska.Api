@@ -141,7 +141,15 @@ namespace QuickTickets.Api.Services
             {
                 return new BadRequestResult();
             }
-
+            var cardEntity = await _context.Cards.FirstOrDefaultAsync(a => a.Id == accountEntity.CardID);
+            if (cardEntity == null) 
+            {
+                return new NotFoundResult();
+            }
+            if (EmailExists(updateUserInfoDto.Email) && (updateUserInfoDto.Email != accountEntity.Email))
+            {
+                return new BadRequestResult();
+            }
             if (accountEntity == null)
             {
                 return new NotFoundResult();
@@ -149,8 +157,12 @@ namespace QuickTickets.Api.Services
             accountEntity.Name = updateUserInfoDto.Name;
             accountEntity.Surname = updateUserInfoDto.Surname;
             accountEntity.Email = updateUserInfoDto.Email;
+            cardEntity.Email = updateUserInfoDto.Email;
+            cardEntity.OwnerName = updateUserInfoDto.Name;
+            cardEntity.OwnerSurname = updateUserInfoDto.Surname;
 
             _context.Accounts.Update(accountEntity);
+            _context.Cards.Update(cardEntity);
             await _context.SaveChangesAsync();
 
             return new OkResult();

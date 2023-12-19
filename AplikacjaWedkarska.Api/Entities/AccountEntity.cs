@@ -23,6 +23,7 @@ namespace AplikacjaWedkarska.Api.Entities
         public bool IsDeleted { get; set; }
 
         public int RoleID { get; set; }
+        public virtual RoleEntity? Role { get; set; }
 
         public string CardID { get; set; }
         public virtual CardEntity? Card { get; set; }

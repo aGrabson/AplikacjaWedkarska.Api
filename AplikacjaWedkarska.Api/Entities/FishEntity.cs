@@ -8,6 +8,5 @@
         public DateTime? ProtectionPeriodStart { get; set; }
         public DateTime? ProtectionPeriodEnd { get; set; }
         public int? DailyLimit { get; set; }
-        public bool UnableToTake { get; set; } = false;
     }
 }
