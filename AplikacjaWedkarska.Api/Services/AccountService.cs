@@ -96,6 +96,7 @@ namespace QuickTickets.Api.Services
 
             _context.Accounts.Add(accountEntity);
             cardEntity.IsRegistered = true;
+            cardEntity.DateModified = DateTime.Now;
             await _context.SaveChangesAsync();
             return new OkResult();
         }
@@ -160,6 +161,7 @@ namespace QuickTickets.Api.Services
             cardEntity.Email = updateUserInfoDto.Email;
             cardEntity.OwnerName = updateUserInfoDto.Name;
             cardEntity.OwnerSurname = updateUserInfoDto.Surname;
+            cardEntity.DateModified = DateTime.Now;
 
             _context.Accounts.Update(accountEntity);
             _context.Cards.Update(cardEntity);

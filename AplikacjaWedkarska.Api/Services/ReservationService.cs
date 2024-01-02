@@ -80,7 +80,7 @@ namespace QuickTickets.Api.Services
             var reservation = await _context.Reservations.Include(x => x.FishingSpot).Where(x => x.Id == id && x.IsCancelled == false).FirstOrDefaultAsync();
             return new OkObjectResult(reservation);
         }
-        public async Task<IActionResult> AddFishToReservation(AddCaughtFishDto addCaughtFishDto)
+        public async Task<IActionResult> AddFishToReservation(AddCaughtFishDto addCaughtFishDto, Guid accountId)
         {
             var reservation = await _context.Reservations.FindAsync(addCaughtFishDto.ReservationId);
             if (reservation == null)
@@ -114,8 +114,9 @@ namespace QuickTickets.Api.Services
             }
 
             var fishLimits = await _context.FishingSpotLimits.FirstOrDefaultAsync(limit => limit.FishId == addCaughtFishDto.FishId && limit.FishingSpotId == reservation.FishingSpotId);
-            var countFishes = await _context.CaughtFishes.Where(x => x.ReservationId == addCaughtFishDto.ReservationId && x.FishId == addCaughtFishDto.FishId && x.Status == CaughtFishStatusEnum.Taken.ToString()).CountAsync();
-            
+            var countFishes = await _context.CaughtFishes.Include(x => x.Reservation).Where(x => x.Reservation.AccountId == accountId && x.FishId == addCaughtFishDto.FishId && x.Status == CaughtFishStatusEnum.Taken.ToString() && x.CatchDateTime > addCaughtFishDto.CatchDateTime.AddHours(-24)).CountAsync();
+            var countFromFishingSpot = await _context.CaughtFishes.Where(x => x.ReservationId == addCaughtFishDto.ReservationId && x.FishId == addCaughtFishDto.FishId && x.Status == CaughtFishStatusEnum.Taken.ToString() && x.CatchDateTime > addCaughtFishDto.CatchDateTime.AddHours(-24)).CountAsync();
+
             if (fish.MinimumSize > addCaughtFishDto.Size)
             {
                 return new BadRequestObjectResult(new { error = "Wystąpił błąd podczas dodawania ryby", errorText = $"Ryba {fish.Species} niewymiarowa!" });
@@ -127,18 +128,24 @@ namespace QuickTickets.Api.Services
 
             if (fishLimits != null)
             {
-                if (fishLimits.DailyLimit <= countFishes)
+                if (fish.DailyLimit <= countFishes)
+                {
+                    return new BadRequestObjectResult(new { error = "Wystąpił błąd podczas dodawania ryby", errorText = $"Limit ryby {fish.Species} przekroczony!" });
+                }
+                else if (fishLimits.DailyLimit <= countFromFishingSpot)
                 {
                     return new BadRequestObjectResult(new { error = "Wystąpił błąd podczas dodawania ryby", errorText = $"Limit ryby {fish.Species} przekroczony!" });
                 }
             }
-            else if(fish.DailyLimit != 0)
+
+
+            else if (fish.DailyLimit != 0)
             {
-                if(fish.DailyLimit < 0)
+                if (fish.DailyLimit < 0)
                 {
                     var CaughtFishesBySpecies = await _context.CaughtFishes.Where(x => x.ReservationId == addCaughtFishDto.ReservationId && x.FishId == addCaughtFishDto.FishId && x.Status == CaughtFishStatusEnum.Taken.ToString()).ToListAsync();
                     double? weight = 0;
-                    foreach( var fishToBeWeight in CaughtFishesBySpecies )
+                    foreach (var fishToBeWeight in CaughtFishesBySpecies)
                     {
                         weight += fishToBeWeight.Weight;
                     }
@@ -152,7 +159,7 @@ namespace QuickTickets.Api.Services
                     return new BadRequestObjectResult(new { error = "Wystąpił błąd podczas dodawania ryby", errorText = $"Limit ryby {fish.Species} przekroczony!" });
                 }
             }
-            else 
+            else
             {
                 return new BadRequestObjectResult(new { error = "Wystąpił błąd podczas dodawania ryby", errorText = $"Ryba {fish.Species} niemożliwa do zabrania!" });
             }

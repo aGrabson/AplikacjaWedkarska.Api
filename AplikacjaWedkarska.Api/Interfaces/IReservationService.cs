@@ -7,7 +7,7 @@ namespace AplikacjaWedkarska.Api.Services
     {
         public Task<IActionResult> GetUserReservations(Guid accountId, int pageNumber, int pageSize);
         public Task<IActionResult> GetReservationDetails(Guid id, Guid accountId);
-        public Task<IActionResult> AddFishToReservation(AddCaughtFishDto addCaughtFishDto);
+        public Task<IActionResult> AddFishToReservation(AddCaughtFishDto addCaughtFishDto, Guid accountId);
         public Task<IActionResult> GetUserFishes(Guid reservationId);
         public Task<IActionResult> Reserve(ReservationDto reservationDto, Guid accountId);
         public Task CheckIfReservationsActive(Guid accountId);

@@ -40,7 +40,9 @@ namespace AplikacjaWedkarska.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AddFishToReservation(AddCaughtFishDto addCaughtFishDto)
         {
-            return await _reservationService.AddFishToReservation(addCaughtFishDto);
+            Guid userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //Guid userId = Guid.Parse("11AAB16C-7C2C-13A4-557D-7D1AA32D4A23");
+            return await _reservationService.AddFishToReservation(addCaughtFishDto, userId);
         }
 
         [HttpGet("getUserFishes/{reservationId}")]
